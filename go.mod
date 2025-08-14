@@ -1,4 +1,4 @@
-module github.com/distributed-lab/bulletproofs
+module github.com/afsheenb/bulletproofs
 
 go 1.23.0
 

@@ -6,7 +6,6 @@ package bulletproofs
 
 import (
 	"github.com/cloudflare/bn256"
-	"github.com/ethereum/go-ethereum/crypto"
 	"math/big"
 	"testing"
 )
@@ -20,9 +19,10 @@ func TestKeccakFS(t *testing.T) {
 
 	c2 := new(big.Int).Mod(
 		new(big.Int).SetBytes(
-			crypto.Keccak256(
+			Keccak256(
 				scalarTo32Byte(bint(1)),
 				scalarTo32Byte(bint(2)),
+				scalarTo32Byte(bint(1)), // counter from GetChallenge
 			),
 		),
 		bn256.Order,
@@ -37,10 +37,12 @@ func TestKeccakFS(t *testing.T) {
 
 	c4 := new(big.Int).Mod(
 		new(big.Int).SetBytes(
-			crypto.Keccak256(
+			Keccak256(
 				scalarTo32Byte(bint(1)),
 				scalarTo32Byte(bint(2)),
+				scalarTo32Byte(bint(1)), // counter from first GetChallenge
 				scalarTo32Byte(bint(3)),
+				scalarTo32Byte(bint(2)), // counter from second GetChallenge
 			),
 		),
 		bn256.Order,

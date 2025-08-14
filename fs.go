@@ -6,7 +6,6 @@ package bulletproofs
 
 import (
 	"github.com/cloudflare/bn256"
-	"github.com/ethereum/go-ethereum/crypto"
 	"math/big"
 )
 
@@ -17,12 +16,12 @@ type FiatShamirEngine interface {
 }
 
 type KeccakFS struct {
-	state   crypto.KeccakState
+	state   KeccakState
 	counter int
 }
 
 func NewKeccakFS() FiatShamirEngine {
-	return &KeccakFS{state: crypto.NewKeccakState()}
+	return &KeccakFS{state: NewKeccakState()}
 }
 
 func (k *KeccakFS) AddPoint(p *bn256.G1) {

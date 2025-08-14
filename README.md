@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ⚠️ __Please note - this crypto library has not been audited, so use it at your own risk.__
+⚠️ __Please note - this library has been forked from the original to remove depndencies on go-ethereum.__
 
 ## Abstract
 
@@ -38,7 +39,7 @@ package main
 
 import (
 	"github.com/cloudflare/bn256"
-	"github.com/distributed-lab/bulletproofs"
+	"github.com/afsheenb/bulletproofs"
 	"math/big"
 )
 
@@ -109,7 +110,7 @@ Check the following snippet with an example of WNLA usage:
 package main
 
 import (
-	"github.com/distributed-lab/bulletproofs"
+	"github.com/afsheenb/bulletproofs"
 	"math/big"
 )
 
@@ -142,7 +143,7 @@ package main
 
 import (
 	"github.com/cloudflare/bn256"
-	"github.com/distributed-lab/bulletproofs"
+	"github.com/afsheenb/bulletproofs"
 )
 
 func main() {

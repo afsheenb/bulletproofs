@@ -5,8 +5,8 @@
 package bulletproofs
 
 import (
-	"hash"
 	"golang.org/x/crypto/sha3"
+	"hash"
 )
 
 // KeccakState wraps sha3.state. In addition to the usual hash methods, it also supports

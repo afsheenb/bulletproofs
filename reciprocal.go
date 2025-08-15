@@ -41,7 +41,7 @@ func ProveRange(public *ReciprocalPublic, fs FiatShamirEngine, private *Reciproc
 		r[j] = inv(add(private.Digits[j], e))
 	}
 
-	rBlind := MustRandScalar()
+	rBlind := NewRandScalar()
 	rCom := public.CommitPoles(r, rBlind)
 
 	v := []*big.Int{private.X}

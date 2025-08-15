@@ -174,8 +174,8 @@ func ProveCircuit(public *ArithmeticCircuitPublic, V []*bn256.G1, fs FiatShamirE
 
 func commitOL(public *ArithmeticCircuitPublic, wo, wl []*big.Int) (ro []*big.Int, rl []*big.Int, no []*big.Int, nl []*big.Int, lo []*big.Int, ll []*big.Int, Co *bn256.G1, Cl *bn256.G1) {
 	// contains random values, except several positions
-	ro = []*big.Int{MustRandScalar(), MustRandScalar(), MustRandScalar(), MustRandScalar(), bint(0), MustRandScalar(), MustRandScalar(), MustRandScalar(), bint(0)} // 9
-	rl = []*big.Int{MustRandScalar(), MustRandScalar(), MustRandScalar(), bint(0), MustRandScalar(), MustRandScalar(), MustRandScalar(), bint(0), bint(0)}          // 9
+	ro = []*big.Int{NewRandScalar(), NewRandScalar(), NewRandScalar(), NewRandScalar(), bint(0), NewRandScalar(), NewRandScalar(), NewRandScalar(), bint(0)} // 9
+	rl = []*big.Int{NewRandScalar(), NewRandScalar(), NewRandScalar(), bint(0), NewRandScalar(), NewRandScalar(), NewRandScalar(), bint(0), bint(0)}         // 9
 
 	nl = wl // Nm
 
@@ -217,7 +217,7 @@ func commitOL(public *ArithmeticCircuitPublic, wo, wl []*big.Int) (ro []*big.Int
 
 func commitR(public *ArithmeticCircuitPublic, wo, wr []*big.Int) (rr []*big.Int, nr []*big.Int, lr []*big.Int, Cr *bn256.G1) {
 	// contains random values, except several positions
-	rr = []*big.Int{MustRandScalar(), MustRandScalar(), bint(0), MustRandScalar(), MustRandScalar(), MustRandScalar(), bint(0), bint(0), bint(0)} // 9
+	rr = []*big.Int{NewRandScalar(), NewRandScalar(), bint(0), NewRandScalar(), NewRandScalar(), NewRandScalar(), bint(0), bint(0), bint(0)} // 9
 
 	nr = wr // Nm
 
@@ -296,12 +296,12 @@ func innerArithmeticCircuitProve(public *ArithmeticCircuitPublic, fs FiatShamirE
 	// Prover computes
 	ls := make([]*big.Int, public.Nv) // Nv
 	for i := range ls {
-		ls[i] = MustRandScalar()
+		ls[i] = NewRandScalar()
 	}
 
 	ns := make([]*big.Int, public.Nm) // Nm
 	for i := range ns {
-		ns[i] = MustRandScalar()
+		ns[i] = NewRandScalar()
 	}
 
 	lcomb := func(i int) *big.Int {

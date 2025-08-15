@@ -40,7 +40,7 @@ func TestReciprocalRangeProofUInt64(t *testing.T) {
 		X:      X,
 		M:      m,
 		Digits: digits,
-		S:      MustRandScalar(),
+		S:      NewRandScalar(),
 	}
 
 	VCom := public.CommitValue(private.X, private.S)

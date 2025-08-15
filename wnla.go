@@ -7,6 +7,7 @@ package bulletproofs
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/cloudflare/bn256"
 	"math/big"
 )
@@ -30,18 +31,35 @@ func VerifyWNLA(public *WeightNormLinearPublic, proof *WeightNormLinearArgumentP
 	}
 
 	if len(proof.X) == 0 {
-		if !bytes.Equal(public.CommitWNLA(proof.L, proof.N).Marshal(), Com.Marshal()) {
-			return errors.New("failed to verify proof")
+		// Base case: verify final commitment matches the reduced parameters
+		commitment := public.CommitWNLA(proof.L, proof.N)
+		if commitment == nil {
+			return errors.New("commitment calculation failed - possible overflow")
+		}
+
+		if !bytes.Equal(commitment.Marshal(), Com.Marshal()) {
+			return fmt.Errorf("failed to verify proof: final commitment mismatch")
 		}
 
 		return nil
 	}
 
-	fs.AddPoint(Com)
-	fs.AddPoint(proof.X[0])
-	fs.AddPoint(proof.R[0])
-	fs.AddNumber(bint(len(public.HVec)))
-	fs.AddNumber(bint(len(public.GVec)))
+	// Simple Fiat-Shamir transcript matching original implementation
+	if err := fs.AddPoint(Com); err != nil {
+		return fmt.Errorf("failed to add commitment to transcript: %w", err)
+	}
+	if err := fs.AddPoint(proof.X[0]); err != nil {
+		return fmt.Errorf("failed to add proof X to transcript: %w", err)
+	}
+	if err := fs.AddPoint(proof.R[0]); err != nil {
+		return fmt.Errorf("failed to add proof R to transcript: %w", err)
+	}
+	if err := fs.AddNumber(bint(len(public.HVec))); err != nil {
+		return fmt.Errorf("failed to add HVec length to transcript: %w", err)
+	}
+	if err := fs.AddNumber(bint(len(public.GVec))); err != nil {
+		return fmt.Errorf("failed to add GVec length to transcript: %w", err)
+	}
 
 	// Challenge using Fiat-Shamir heuristic
 	y := fs.GetChallenge()
@@ -55,6 +73,8 @@ func VerifyWNLA(public *WeightNormLinearPublic, proof *WeightNormLinearArgumentP
 	G_ := vectorPointsAdd(vectorPointMulOnScalar(G0, public.Ro), vectorPointMulOnScalar(G1, y))
 	c_ := vectorAdd(c0, vectorMulOnScalar(c1, y))
 
+	// CRITICAL FIX: Update commitment algebraically
+	// Com' = Com + X*y + R*(y²-1)
 	Com_ := new(bn256.G1).Set(Com)
 	Com_.Add(Com_, new(bn256.G1).ScalarMult(proof.X[0], y))
 	Com_.Add(Com_, new(bn256.G1).ScalarMult(proof.R[0], sub(mul(y, y), bint(1))))
@@ -84,7 +104,14 @@ func VerifyWNLA(public *WeightNormLinearPublic, proof *WeightNormLinearArgumentP
 // satisfies the commitment C (see WeightNormLinearPublic.Commit() function).
 // Use empty FiatShamirEngine for call.
 func ProveWNLA(public *WeightNormLinearPublic, Com *bn256.G1, fs FiatShamirEngine, l, n []*big.Int) *WeightNormLinearArgumentProof {
+	// Pass original commitment unchanged through recursion
+	return proveWNLARecursive(public, Com, fs, l, n)
+}
+
+// proveWNLARecursive handles the recursive proving logic without domain separation
+func proveWNLARecursive(public *WeightNormLinearPublic, Com *bn256.G1, fs FiatShamirEngine, l, n []*big.Int) *WeightNormLinearArgumentProof {
 	if len(l)+len(n) < 6 {
+
 		// Prover sends l, n to Verifier
 		return &WeightNormLinearArgumentProof{
 			R: make([]*bn256.G1, 0),
@@ -122,11 +149,12 @@ func ProveWNLA(public *WeightNormLinearPublic, Com *bn256.G1, fs FiatShamirEngin
 	R.Add(R, vectorPointScalarMul(H1, l1))
 	R.Add(R, vectorPointScalarMul(G1, n1))
 
-	fs.AddPoint(Com)
-	fs.AddPoint(X)
-	fs.AddPoint(R)
-	fs.AddNumber(bint(len(public.HVec)))
-	fs.AddNumber(bint(len(public.GVec)))
+	// Simple Fiat-Shamir transcript matching original implementation
+	_ = fs.AddPoint(Com)
+	_ = fs.AddPoint(X)
+	_ = fs.AddPoint(R)
+	_ = fs.AddNumber(bint(len(public.HVec)))
+	_ = fs.AddNumber(bint(len(public.GVec)))
 
 	// Challenge using Fiat-Shamir heuristic
 	y := fs.GetChallenge()
@@ -149,10 +177,21 @@ func ProveWNLA(public *WeightNormLinearPublic, Com *bn256.G1, fs FiatShamirEngin
 		Mu:   mu2,
 	}
 
-	// Recursive run
-	res := ProveWNLA(
+	// Compute fresh commitment with transformed parameters (correct approach)
+	commitment := public_.CommitWNLA(l_, n_)
+	if commitment == nil {
+		// If commitment fails, return an empty proof indicating failure
+		return &WeightNormLinearArgumentProof{
+			R: []*bn256.G1{},
+			X: []*bn256.G1{},
+			L: l_,
+			N: n_,
+		}
+	}
+
+	res := proveWNLARecursive(
 		public_,
-		public_.CommitWNLA(l_, n_),
+		commitment,
 		fs,
 		l_,
 		n_,

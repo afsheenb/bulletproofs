@@ -82,7 +82,7 @@ func main() {
 		X:      x,                // Committed value
 		M:      m,                // Corresponding multiplicities
 		Digits: digits,           // Corresponding digits
-		S:      MustRandScalar(), // Blinding value (secret) used for committing value as: x*G + Sx*H
+		S:      NewRandScalar(), // Blinding value (secret) used for committing value as: x*G + Sx*H
 	}
 
 	VCom := public.CommitValue(private.X, private.Sx) // Value commitment: x*G + Sx*H

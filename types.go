@@ -103,23 +103,23 @@ type WeightNormLinearPublic struct {
 func NewWeightNormLinearPublic(lLen int, nLen int) *WeightNormLinearPublic {
 	gvec := make([]*bn256.G1, nLen)
 	for i := range gvec {
-		gvec[i] = MustRandPoint()
+		gvec[i] = NewRandPoint()
 	}
 
 	hvec := make([]*bn256.G1, lLen)
 	for i := range hvec {
-		hvec[i] = MustRandPoint()
+		hvec[i] = NewRandPoint()
 	}
 
 	c := make([]*big.Int, lLen)
 	for i := range c {
-		c[i] = MustRandScalar()
+		c[i] = NewRandScalar()
 	}
 
-	ro := MustRandScalar()
+	ro := NewRandScalar()
 
 	return &WeightNormLinearPublic{
-		G:    MustRandPoint(),
+		G:    NewRandPoint(),
 		GVec: gvec,
 		HVec: hvec,
 		C:    c,

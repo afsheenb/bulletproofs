@@ -86,7 +86,7 @@ func TestArithmeticCircuit(t *testing.T) {
 
 	private := &ArithmeticCircuitPrivate{
 		V:  [][]*big.Int{wv},
-		Sv: []*big.Int{MustRandScalar()},
+		Sv: []*big.Int{NewRandScalar()},
 		Wl: wl,
 		Wr: wr,
 		Wo: wo,
@@ -214,7 +214,7 @@ func TestArithmeticCircuitBinaryRangeProof(t *testing.T) {
 
 	private := &ArithmeticCircuitPrivate{
 		V:  v,
-		Sv: []*big.Int{MustRandScalar(), MustRandScalar(), MustRandScalar(), MustRandScalar()},
+		Sv: []*big.Int{NewRandScalar(), NewRandScalar(), NewRandScalar(), NewRandScalar()},
 		Wl: wl,
 		Wr: wr,
 		Wo: wo,
